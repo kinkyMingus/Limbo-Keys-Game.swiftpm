@@ -12,6 +12,7 @@ class Key {
     var image = "key"
     var x : Int = 0
     var y : Int = 0
+    var isMoving: Bool = false
     // number of key: 0-7
     var id : Int
     
