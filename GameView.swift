@@ -7,12 +7,32 @@
 
 import SwiftUI
 
-struct SwiftUIView: View {
+struct GameView: View {
+    @State var keys: [Key] = []
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            LazyVGrid(
+                columns: [GridItem(.flexible()), GridItem(.flexible())],
+                spacing: 8
+            ) {
+
+                ForEach(keys, id: \.id) { key in
+                    Button {
+                        
+                    } label: {
+                        Image(key.image)
+                    }
+                }
+            }
+        }
+        .onAppear() {
+            for i in 0..<8 {
+                keys.append(Key(x: 0, y: 0, id: i))
+            }
+        }
     }
 }
 
 #Preview {
-    SwiftUIView()
+    GameView()
 }
