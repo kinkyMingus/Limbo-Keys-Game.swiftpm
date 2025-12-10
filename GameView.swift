@@ -8,28 +8,45 @@
 import SwiftUI
 
 struct GameView: View {
-    @State var keys: [Key] = []
+    @State var keys: [[Key]] = []
+    @State var move: Bool = false
+    var gridColumns = [GridItem(.flexible()), GridItem(.flexible())]
+    
     var body: some View {
         VStack {
-            LazyVGrid(
-                columns: [GridItem(.flexible()), GridItem(.flexible())],
-                spacing: 8
-            ) {
+            
+            LazyVGrid( columns: gridColumns, spacing: 8 ) {
 
-                ForEach(keys, id: \.id) { key in
-                    Button {
+                ForEach(keys, 0..<keys.count) { r in
+                    
+                    ForEach(keys[r], 0..<keys[r].count) { c in
                         
-                    } label: {
-                        Image(key.image)
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                move.toggle()
+                            }
+                        } label: {
+                            Image(keys[r][c].image)
+                                .resizable()
+                                .scaledToFit()
+                        }
+                        .offset(x: move ? 0 : 150, y: 0)
                     }
+                    
+                }
+                
+            }
+            
+        }
+        .onAppear() {
+            for r in 0..<4 {
+                for c in 0..<2 {
+                    keys[r].append(Key(id: 0))
                 }
             }
         }
-        .onAppear() {
-            for i in 0..<8 {
-                keys.append(Key(x: 0, y: 0, id: i))
-            }
-        }
+        .frame(width: .infinity, height: .infinity)
+        .backgroundStyle(.black)
     }
 }
 

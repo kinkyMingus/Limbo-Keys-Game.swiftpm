@@ -10,12 +10,12 @@ import SwiftUI
 
 class Key {
     var image = "key"
-    var x : Int
-    var y : Int
+    var x : Int = 0
+    var y : Int = 0
     // number of key: 0-7
     var id : Int
     
-    init(image: String = "key", x: Int, y: Int, id: Int) {
+    init(image: String = "key", x: Int = 0, y: Int = 0, id: Int) {
         self.image = image
         self.x = x
         self.y = y
