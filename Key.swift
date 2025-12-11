@@ -8,15 +8,15 @@
 import Foundation
 import SwiftUI
 
-class Key {
+class Key : Identifiable {
+    // number of key: 0-7
+    let id : Int
     var image = "key"
     var x : Int = 0
     var y : Int = 0
     var isMoving: Bool = false
-    // number of key: 0-7
-    var id : Int
     
-    init(image: String = "key", x: Int = 0, y: Int = 0, id: Int) {
+    init(id: Int, image: String = "key", x: Int = 0, y: Int = 0) {
         self.image = image
         self.x = x
         self.y = y

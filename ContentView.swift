@@ -8,6 +8,7 @@ struct ContentView: View {
                     GameView()
                 } label: {
                     Text("click me")
+                        .font(.largeTitle)
                 }
             }
         }
