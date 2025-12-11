@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct GameView: View {
-    //@State var keys: [[Key]] = []
     @State private var keys: [[Key]] = (0..<4).map { row in
         (0..<2).map { col in
             Key(id: row * 2 + col)
@@ -29,8 +28,8 @@ struct GameView: View {
                 spacing: 8
             ) {
                 ForEach(flatKeys) { key in
-                    Button{
-                        
+                    Button {
+
                     } label: {
                         Image(key.image)
                             .resizable()
@@ -44,50 +43,37 @@ struct GameView: View {
                     move.toggle()
                 }
             }
-            
+
             Button {
-                
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    shuffle()
+                }
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
                         .frame(width: 120, height: 60)
                         .foregroundStyle(.white)
-                    
+
                     Text("Start")
                         .font(.title)
                         .foregroundStyle(.black)
                 }
             }
 
-            /*LazyVGrid(columns: gridColumns, spacing: 8) {
-            
-            
-            
-                ForEach(0..<keys.count, id: \.self) { r in
-            
-                    ForEach(0..<keys[r].count, id: \.self) { c in
-            
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                keys.isMoving.toggle()
-                            }
-                        } label: {
-                            let key = keys[r][c]
-                            Image(key.image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 120, height: 120)
-                        }
-                        .offset(x: keys.isMoving ? 0 : 150, y: 0)
-                    }
-            
-                }
-            
-            }*/
-
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
+    }
+
+    func shuffle() {
+
+        var flatKeys = keys.flatMap { $0 }
+
+        flatKeys.shuffle()
+
+        keys = stride(from: 0, to: flatKeys.count, by: 2).map { i in
+            Array(flatKeys[i..<i + 2])
+        }
     }
 
 }
