@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct GameView: View {
+
     @State private var keys: [[Key]] = (0..<4).map { row in
         (0..<2).map { col in
             Key(id: row * 2 + col)
         }
     }
-
-    @State private var move = false
-
-    let gridColumns = [GridItem(.flexible()), GridItem(.flexible())]
+    
+    @State var focus = false
 
     var body: some View {
         VStack {
+            
+            Text("FOCUS")
+                .foregroundStyle(.red)
+                .font(.largeTitle)
+                .opacity(focus ? 1 : 0)
+                .offset(y: focus ? 0 : 40)
+                .animation(.easeInOut(duration: 0.5), value: focus)
 
             let flatKeys = keys.flatMap { $0 }
 
@@ -38,16 +44,23 @@ struct GameView: View {
                     }
                 }
             }
-            .onAppear {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    move.toggle()
-                }
-            }
 
             Button {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    shuffle()
+                
+                focus = true
+
+                Task {
+                    for _ in 0...10 {
+                        
+                        try? await Task.sleep(nanoseconds: 400_000_000)
+
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            shuffle()
+                        }
+                    }
+                    focus = false
                 }
+
             } label: {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
@@ -59,6 +72,7 @@ struct GameView: View {
                         .foregroundStyle(.black)
                 }
             }
+            .transition(.opacity)
 
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
