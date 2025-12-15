@@ -189,7 +189,6 @@ struct GameView: View {
     }
 
     func startGame() {
-        focus = true
 
         targetKeyID = Int.random(in: 0..<8)
 
@@ -198,8 +197,11 @@ struct GameView: View {
         }
 
         Task {
-
             try? await Task.sleep(nanoseconds: 500_000_000)
+            
+            focus = true
+
+            try? await Task.sleep(nanoseconds: 1000_000_000)
             withAnimation(.easeInOut(duration: 0.5)) {
                 isFlashing = false
             }
@@ -215,11 +217,15 @@ struct GameView: View {
             focus = false
 
             var colors = keyColors.shuffled()
-            finalColors = Dictionary(
-                uniqueKeysWithValues: keys.flatMap { $0 }.map {
-                    ($0.id, colors.removeFirst())
-                }
-            )
+            
+            withAnimation(.easeInOut(duration: 0.5)) {
+                finalColors = Dictionary(
+                    uniqueKeysWithValues: keys.flatMap { $0 }.map {
+                        ($0.id, colors.removeFirst())
+                    }
+                )
+            }
+            
         }
     }
 
