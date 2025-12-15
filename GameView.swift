@@ -14,7 +14,7 @@ struct GameView: View {
             Key(id: row * 2 + col)
         }
     }
-
+    
     @State var focus = false
     @State private var targetKeyID: Int? = nil
     @State private var isFlashing = false
