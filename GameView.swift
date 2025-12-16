@@ -102,14 +102,17 @@ struct GameView: View {
             }
 
         }
+        //starts the game immediately
         .onAppear() {
             Task {
-                    try? await Task.sleep(nanoseconds: 1_000_000_000) 
+                //gives the player time to react when the open it up
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
                     startGame()
                 }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
+        //alert with ternaries for when you click a key (correct vs incorrect)
         .alert(
             wasCorrect ? "Correct" : "Incorrect",
             isPresented: $showResultAlert

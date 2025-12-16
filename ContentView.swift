@@ -7,11 +7,26 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                Text("Limbo Keys: The Game")
+                    .font(.largeTitle)
+                    .foregroundStyle(.white)
+                    .padding(.vertical, 30)
+                
+                
                 Button {
                     showGame = true
                 } label: {
-                    Text("click me")
-                        .font(.largeTitle)
+                    ZStack {
+                        
+                        RoundedRectangle(cornerRadius: 30)
+                            .frame(width: 150, height: 80)
+                            .foregroundStyle(.white)
+                        
+                        Text("START")
+                            .font(.largeTitle)
+                            .foregroundStyle(.black)
+                            
+                    }
                 }
                 .navigationDestination(isPresented: $showGame) {
                     GameView()
@@ -20,6 +35,8 @@ struct ContentView: View {
                         .interactiveDismissDisabled(true)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
         }
     }
 }
