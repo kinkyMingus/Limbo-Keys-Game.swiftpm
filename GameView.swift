@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AVKit
 
 struct GameView: View {
 
@@ -19,23 +18,26 @@ struct GameView: View {
 
     //empty cariable to store the id of the target key
     @State private var targetKeyID: Int? = nil
-    
+
     //variable to control the animation of the green flash
     @State private var isFlashing = false
-    
+
     //dictionary for the colors that show after shuffle
     @State private var finalColors: [Int: Color] = [:]
-    
+
     //alert variables
     @State private var showResultAlert = false
     @State private var wasCorrect = false
 
-    //used for music
-    @State private var player: AVAudioPlayer?
-    
     //shuffling and round counter
-    @State var shuffling = false
+    @State var shuffling = true
     @State var round: Int = 1
+    //animation bulls**t
+    @State var bob = false
+    @State var idle = false
+
+    //persisting high score
+    @AppStorage("highScore") var highScore: Int = 0
 
     //formations
     let formations = Formations().formations
@@ -44,10 +46,9 @@ struct GameView: View {
     let keyColors: [Color] = [
         .red, .orange, .yellow, .green, .blue, .teal, .purple, .pink,
     ]
-    
+
     // allows for the alert to take you back to the content view
     @Environment(\.dismiss) private var dismiss
-
 
     var body: some View {
         VStack {
@@ -87,28 +88,30 @@ struct GameView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 120, height: 120)
+                            // Color change
                             .colorMultiply(
                                 key.id == targetKeyID && isFlashing
                                     ? .green
                                     : finalColors[key.id] ?? .white
                             )
+                            .offset(y: key.id == targetKeyID && isFlashing ? -3 : 0)
                             .animation(
                                 .easeInOut(duration: 0.5),
                                 value: isFlashing
                             )
                     }
-                        .disabled(shuffling)
+                    .disabled(shuffling)
                 }
             }
 
         }
         //starts the game immediately
-        .onAppear() {
+        .onAppear {
             Task {
                 //gives the player time to react when the open it up
-                    try? await Task.sleep(nanoseconds: 1_000_000_000)
-                    startGame()
-                }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                startGame()
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
@@ -126,13 +129,18 @@ struct GameView: View {
             Button("Main Menu") {
                 resetBoard()
                 //takes you back to content view
+
+                if round > highScore {
+                    highScore = round
+                }
+
                 dismiss()
             }
         } message: {
             Text(
                 wasCorrect
-                ? "You tracked the correct key."
-                : "You lost track of the key."
+                    ? "You tracked the correct key."
+                    : "You lost track of the key."
             )
         }
 
@@ -149,20 +157,22 @@ struct GameView: View {
 
         Task {
 
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            
             shuffling = true
+
+            try? await Task.sleep(nanoseconds: 500_000_000)
 
             try? await Task.sleep(nanoseconds: 1000_000_000)
             withAnimation(.easeInOut(duration: 0.5)) {
                 isFlashing = false
             }
-            // Play music
-            playSound(named: "Limbo Keys")
-            // Goes for 16 bar in the song
+
             for _ in 0...16 {
-                // Roughly 200 bpm
-                try? await Task.sleep(nanoseconds: 300_000_000)
+                // Subtract nanoseconds down, up until it is lower then 250_000_000
+                try? await Task.sleep(
+                    nanoseconds: UInt64(
+                        max(250_000_000, 500_000_000 - round * 20_000_000)
+                    )
+                )
 
                 withAnimation(.easeInOut(duration: 0.3)) {
                     shuffle()
@@ -172,7 +182,7 @@ struct GameView: View {
             shuffling = false
 
             var colors = keyColors.shuffled()
-            
+
             withAnimation(.easeInOut(duration: 0.5)) {
                 finalColors = Dictionary(
                     uniqueKeysWithValues: keys.flatMap { $0 }.map {
@@ -180,10 +190,9 @@ struct GameView: View {
                     }
                 )
             }
-            
         }
     }
-    
+
     //helps to reset the keys between rounds
     func resetBoard() {
         finalColors = [:]
@@ -198,19 +207,25 @@ struct GameView: View {
             }
         }
     }
-
+    // Ensures no repeatable formations happens; always unique
+    @State var lastRandomIndex = [[0]]
 
     //function for each shuffle
     func shuffle() {
-        
+
         let random = Double.random(in: 0...1)
 
         if random < 0.2 {
             randomShuffle()
         } else {
+
             guard let formation = formations.randomElement() else { return }
-            
-            applyFormation(formation)
+
+            if lastRandomIndex != formation {
+                applyFormation(formation)
+            } else {
+                shuffle()
+            }
         }
 
     }
@@ -240,23 +255,7 @@ struct GameView: View {
                 }
             }
         }
-
-    }
-
-    //for music
-    func playSound(named name: String) {
-        // Check if sound file even exists
-        guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else {
-            print("Sound file not found")
-            return
-        }
-        // Play sound, catch 
-        do {
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.play()
-        } catch {
-            print("Error playing sound: \(error.localizedDescription)")
-        }
+        lastRandomIndex = formation
     }
 
 }
