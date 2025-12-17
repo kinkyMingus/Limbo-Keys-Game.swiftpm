@@ -19,7 +19,7 @@ let package = Package(
             bundleIdentifier: "clc.Limbo-Keys-Game",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .placeholder(icon: .bandage),
+            appIcon: .asset("AppIcon"),
             accentColor: .presetColor(.red),
             supportedDeviceFamilies: [
                 .pad,
