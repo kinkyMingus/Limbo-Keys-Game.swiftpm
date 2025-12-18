@@ -32,9 +32,6 @@ struct GameView: View {
     //shuffling and round counter
     @State var shuffling = true
     @State var round: Int = 1
-    //animation bulls**t
-    @State var bob = false
-    @State var idle = false
 
     //persisting high score
     @AppStorage("highScore") var highScore: Int = 0
@@ -122,6 +119,11 @@ struct GameView: View {
         ) {
             Button("Play Again") {
                 round = wasCorrect ? round + 1 : 1
+                
+                if round > highScore {
+                    highScore = round
+                }
+                
                 resetBoard()
                 startGame()
             }
@@ -170,7 +172,7 @@ struct GameView: View {
                 // Subtract nanoseconds down, up until it is lower then 250_000_000
                 try? await Task.sleep(
                     nanoseconds: UInt64(
-                        max(250_000_000, 500_000_000 - round * 20_000_000)
+                        min(250_000_000, 500_000_000 - round * 20_000_000)
                     )
                 )
 
