@@ -172,7 +172,7 @@ struct GameView: View {
                 // Subtract nanoseconds down, up until it is lower then 250_000_000
                 try? await Task.sleep(
                     nanoseconds: UInt64(
-                        min(250_000_000, 500_000_000 - round * 20_000_000)
+                        max(250_000_000, 500_000_000 - round * 20_000_000)
                     )
                 )
 
